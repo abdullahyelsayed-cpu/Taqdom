@@ -5,7 +5,7 @@ window.TAQDOM_CONFIG = {
   PLATFORM_FEE_PCT: 1.5,
   ADMIN_EMAIL: "admin@taqdom.me",
   PAYMENTS: {
-    paymob: { enabled: false, note的总体: "Activation pending — merchant keys required" },
+    paymob: { enabled: false, note: "Activation pending — merchant keys required" },
     crypto: {
       enabled: true,
       networks: [
