@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Operator Console — Taqdom.ai</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 2 28 9v14L16 30 4 23V9z' fill='%2301102e' stroke='%2374f7b2' stroke-width='2'/><circle cx='16' cy='16' r='4' fill='%2374f7b2'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&family=Tajawal:wght@400;500;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+  <div class="bg-veil" aria-hidden="true"></div>
+  <button id="bg-toggle" title="Pause background motion" aria-pressed="true">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="2" width="3.4" height="12" rx="1" fill="currentColor"/><rect x="9.6" y="2" width="3.4" height="12" rx="1" fill="currentColor"/></svg>
+  </button>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html">
+        <svg width="34" height="34" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <path d="M16 2 28 9v14L16 30 4 23V9z" stroke="#74f7b2" stroke-width="1.6" fill="rgba(116,247,178,.07)"/>
+          <circle cx="16" cy="16" r="3.4" fill="#74f7b2"/>
+          <path d="M16 5.5v7.2M16 19.3v7.2M6.8 11.8l6.2 3.6M18.9 16.6l6.3 3.6M25.2 11.8 19 15.4M13.1 16.6l-6.3 3.6" stroke="#74f7b2" stroke-width="1" opacity=".55"/>
+        </svg>
+        <span>Taqdom<small>Operator</small></span>
+      </a>
+      <nav class="main-nav" aria-label="Main">
+        <a href="index.html" data-i18n="nav_home">Home</a>
+        <a href="marketplace.html" data-i18n="nav_market">Marketplace</a>
+        <a href="agents.html" data-i18n="nav_agents">Agents</a>
+      </nav>
+      <div class="header-status" data-live-status></div>
+      <div data-auth-slot><a class="btn btn-mint btn-sm" href="agents.html">Sign in</a></div>
+      <button class="nav-toggle" aria-label="Menu">☰</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="section">
+      <div class="container">
+        <!-- Gate -->
+        <div id="admin-gate" hidden>
+          <div class="dossier" style="max-width:480px;margin:64px auto;text-align:center;padding:56px 32px">
+            <div class="folio" style="justify-content:center">RESTRICTED · CLEARANCE 5</div>
+            <h1 class="h-2" data-i18n="admin_only">Admin clearance required — sign in with the operator account.</h1>
+            <div style="margin-top:28px"><button class="btn btn-mint" id="gate-login" data-i18n="sign_in">Sign in</button></div>
+          </div>
+        </div>
+
+        <!-- Console -->
+        <div id="admin-dash" hidden>
+          <div class="folio">OPERATOR · COMMAND DECK</div>
+          <h1 class="h-1">Console</h1>
+
+          <div class="grid grid-4" style="margin-top:40px">
+            <div class="dossier stat-tile"><div class="num" id="k-users">—</div><div class="lbl">Clients / Agents</div></div>
+            <div class="dossier stat-tile"><div class="num" id="k-listings">—</div><div class="lbl">Live listings</div></div>
+            <div class="dossier stat-tile"><div class="num" id="k-orders">—</div><div class="lbl">Orders</div></div>
+            <div class="dossier stat-tile"><div class="num" id="k-visits">—</div><div class="lbl">Tracked visits</div></div>
+          </div>
+          <div class="grid grid-2" style="margin-top:24px">
+            <div class="dossier stat-tile"><div class="num mint" id="k-gmv">—</div><div class="lbl">Gross merchandise value</div></div>
+            <div class="dossier stat-tile"><div class="num mint" id="k-fees">—</div><div class="lbl">Platform revenue (1.5%)</div></div>
+          </div>
+
+          <div class="grid grid-2" style="margin-top:40px">
+            <div class="dossier"><h3 class="h-3" style="margin-bottom:16px">Orders / day — 14d</h3><canvas class="chart-box" id="ch-orders"></canvas></div>
+            <div class="dossier"><h3 class="h-3" style="margin-bottom:16px">Revenue / day — 14d</h3><canvas class="chart-box" id="ch-revenue"></canvas></div>
+            <div class="dossier"><h3 class="h-3" style="margin-bottom:16px">Listings by category</h3><canvas class="chart-box" id="ch-cats"></canvas></div>
+            <div class="dossier"><h3 class="h-3" style="margin-bottom:16px">Traffic / day — 7d</h3><canvas class="chart-box" id="ch-traffic"></canvas></div>
+          </div>
+
+          <h3 class="h-3" style="margin:48px 0 16px">Orders</h3>
+          <div class="dossier" style="padding:8px;overflow-x:auto" id="admin-orders"></div>
+
+          <h3 class="h-3" style="margin:48px 0 16px">Clients — what they run</h3>
+          <div class="dossier" style="padding:8px;overflow-x:auto" id="admin-users"></div>
+
+          <h3 class="h-3" style="margin:48px 0 16px">Inbox — contact transmissions</h3>
+          <div id="admin-inbox"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/js/supabase-config.js"></script>
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/core.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/bg.js" defer></script>
+  <script src="assets/js/admin.js" defer></script>
+</body>
+</html>
