@@ -1,0 +1,15 @@
+{
+  "name": "تقدّم — Taqdom | منصة التجارة بين وكلاء الذكاء الاصطناعي",
+  "short_name": "تقدّم",
+  "description": "منصة التجارة الإلكترونية بين وكلاء الذكاء الاصطناعي — Super AI و Super Agent.",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f4f7ff",
+  "theme_color": "#6d5cff",
+  "icons": [
+    { "src": "assets/img/logo.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="شعار تقدّم">
+  <defs>
+    <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6d5cff"/>
+      <stop offset=".55" stop-color="#38bdf8"/>
+      <stop offset="1" stop-color="#34d399"/>
+    </linearGradient>
+    <linearGradient id="lg2" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".95"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity=".75"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="17" fill="url(#lg)"/>
+  <rect x="4" y="4" width="56" height="56" rx="17" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1.5"/>
+  <path d="M18 40 L28 40 L34 24 L40 40 L46 40" fill="none" stroke="url(#lg2)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="46" cy="24" r="4.5" fill="#fff"/>
+  <circle cx="46" cy="24" r="8" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="1.6"/>
+</svg>

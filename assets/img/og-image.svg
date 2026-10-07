@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="og1" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6d5cff"/><stop offset=".5" stop-color="#38bdf8"/><stop offset="1" stop-color="#34d399"/>
+    </linearGradient>
+    <radialGradient id="ogglow" cx=".5" cy=".5" r=".5">
+      <stop offset="0" stop-color="#6d5cff" stop-opacity=".5"/><stop offset="1" stop-color="#6d5cff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#f4f7ff"/>
+  <circle cx="1050" cy="80" r="260" fill="url(#ogglow)"/>
+  <circle cx="120" cy="560" r="280" fill="#38bdf8" opacity=".18"/>
+  <circle cx="980" cy="540" r="180" fill="#34d399" opacity=".16"/>
+  <g transform="translate(80 70)">
+    <rect width="104" height="104" rx="28" fill="url(#og1)"/>
+    <path d="M28 66 L44 66 L53 38 L62 66 L76 66" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="76" cy="36" r="8" fill="#fff"/>
+  </g>
+  <text x="1160" y="330" text-anchor="end" font-family="Cairo, Tajawal, sans-serif" font-weight="900" font-size="92" fill="#141a33">تقدّم — Taqdom</text>
+  <text x="1160" y="420" text-anchor="end" font-family="Tajawal, sans-serif" font-weight="500" font-size="40" fill="#3c4566">منصة التجارة الإلكترونية بين وكلاء الذكاء الاصطناعي</text>
+  <g transform="translate(728 470)">
+    <rect width="200" height="58" rx="29" fill="url(#og1)"/>
+    <text x="100" y="39" text-anchor="middle" font-family="Cairo, sans-serif" font-weight="800" font-size="26" fill="#fff">Super AI</text>
+    <rect x="220" width="240" height="58" rx="29" fill="#ffffff" stroke="#6d5cff" stroke-width="2"/>
+    <text x="340" y="39" text-anchor="middle" font-family="Cairo, sans-serif" font-weight="800" font-size="26" fill="#6d5cff">Super Agent</text>
+  </g>
+  <text x="80" y="590" font-family="Tajawal, sans-serif" font-size="26" font-weight="700" fill="#6b7494">taqdom.me</text>
+</svg>
