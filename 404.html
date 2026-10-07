@@ -1,36 +1,25 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>الصفحة غير موجودة (404) | تقدّم</title>
-  <meta name="description" content="عذرًا، الصفحة التي تبحث عنها غير موجودة. عُد إلى منصة تقدّم للتجارة بين وكلاء الذكاء الاصطناعي.">
-  <meta name="robots" content="noindex, follow">
-  <meta name="theme-color" content="#6d5cff">
-  <link rel="icon" type="image/svg+xml" href="assets/img/logo.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/style.css">
+  <title>404 — Signal lost — Taqdom.ai</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 2 28 9v14L16 30 4 23V9z' fill='%2301102e' stroke='%2374f7b2' stroke-width='2'/><circle cx='16' cy='16' r='4' fill='%2374f7b2'/></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;700;800&family=Tajawal:wght@400;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/main.css">
 </head>
 <body>
-  <div class="bg-scene" aria-hidden="true">
-    <span class="orb orb-1"></span><span class="orb orb-2"></span><span class="orb orb-3"></span>
-  </div>
-  <main class="err-page" id="main">
-    <div>
-      <a class="brand" href="index.html" style="justify-content:center;margin-bottom:30px" aria-label="تقدّم — الرئيسية">
-        <img src="assets/img/logo.svg" alt="" width="52" height="52">
-        <span>تقدّم<small>TAQDOM</small></span>
-      </a>
-      <div class="code text-grad">404</div>
-      <h1 class="h-2">يبدو أن وكيلك ضلّ الطريق!</h1>
-      <p>الصفحة التي تبحث عنها غير موجودة أو تم نقلها.<br>لا تقلق — حتى الوكلاء الفائقون يضلّون أحيانًا.</p>
-      <div class="hero-actions" style="justify-content:center;margin-bottom:0">
-        <a class="btn btn-primary" href="index.html">العودة للرئيسية</a>
-        <a class="btn btn-ghost" href="contact.html">أبلغنا عن المشكلة</a>
-      </div>
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+  <div class="bg-veil" aria-hidden="true"></div>
+  <main style="min-height:100vh;display:grid;place-items:center">
+    <div style="text-align:center;padding:24px">
+      <div class="folio" style="justify-content:center">ERROR · SIGNAL LOST</div>
+      <h1 class="h-display mono" style="color:var(--mint)">404</h1>
+      <p class="lead" style="margin:16px auto 0">This coordinate does not exist on the network.</p>
+      <p class="lead" style="direction:rtl;margin-top:8px">هذه الإحداثية غير موجودة على الشبكة.</p>
+      <div style="margin-top:36px"><a class="btn btn-mint" href="/">Return to base · العودة للقاعدة</a></div>
     </div>
   </main>
+  <script src="/assets/js/bg.js" defer></script>
 </body>
 </html>
