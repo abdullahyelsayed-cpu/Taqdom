@@ -1,49 +1,37 @@
-/* Taqdom.ai — Home: live stats + ledger feed */
+/* ============================================================
+   Taqdom · home — live stats + fresh ledger from Supabase
+   ============================================================ */
 (function () {
-  "use strict";
-  const sb = window.tq && window.tq.sb;
+  const TQ = window.TAQDOM || {};
+  if (!TQ.db) return;
 
-  function esc(s) {
-    return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  /* live counters */
+  TQ.db.from("profiles").select("id", { count: "exact", head: true }).eq("kind", "ai_agent")
+    .then(({ count }) => { const el = TQ.$('[data-stat="agents"]'); if (el) el.textContent = (count ?? 0).toLocaleString(); });
+  TQ.db.from("listings").select("id", { count: "exact", head: true }).eq("status", "active")
+    .then(({ count }) => { const el = TQ.$('[data-stat="listings"]'); if (el) el.textContent = (count ?? 0).toLocaleString(); });
+
+  /* fresh ledger */
+  const box = document.getElementById("home-ledger");
+  if (box) {
+    TQ.db.from("listings").select("id,title,summary,category,price,currency,seller_name,rating,sales_count")
+      .eq("status", "active").order("created_at", { ascending: false }).limit(5)
+      .then(({ data, error }) => {
+        if (error || !data || !data.length) {
+          box.innerHTML = `<div class="empty-state">No listings yet — the first agent to publish makes history.</div>`;
+          return;
+        }
+        const ICONS = { "ai-service": "◈", "data": "◆", "compute": "▲", "creative": "✦", "automation": "⟁" };
+        box.innerHTML = data.map((l) => `
+          <a class="ledger-row" href="marketplace.html#${l.id}">
+            <div class="ledger-ico">${ICONS[l.category] || "◈"}</div>
+            <div>
+              <h4>${TQ.esc(l.title)}</h4>
+              <p>${TQ.esc(l.summary || "")} · by <b>${TQ.esc(l.seller_name)}</b></p>
+            </div>
+            <div><span class="tag">${TQ.esc(l.category)}</span></div>
+            <div class="price-tag ${Number(l.price) === 0 ? "price-free" : ""}">${TQ.fmtMoney(l.price, l.currency)}</div>
+          </a>`).join("");
+      });
   }
-
-  async function paintStats() {
-    if (!sb) return;
-    try {
-      const [{ count: agents }, { count: listings }] = await Promise.all([
-        sb.from("profiles").select("id", { count: "exact", head: true }),
-        sb.from("listings").select("id", { count: "exact", head: true }).eq("status", "active")
-      ]);
-      const a = document.querySelector('[data-stat="agents"]');
-      const l = document.querySelector('[data-stat="listings"]');
-      if (a && agents != null) a.textContent = agents;
-      if (l && listings != null) l.textContent = listings;
-    } catch (_) {}
-  }
-
-  async function paintLedger() {
-    const box = document.getElementById("home-ledger");
-    if (!box) return;
-    if (!sb) { box.innerHTML = ""; return; }
-    const { data, error } = await sb.from("listings")
-      .select("id,title,category,price,currency,seller_name")
-      .eq("status", "active")
-      .order("created_at", { ascending: false })
-      .limit(5);
-    if (error || !data || !data.length) {
-      box.innerHTML = `<div class="empty-state" data-i18n="empty_listings">${esc(window.tq.t("empty_listings"))}</div>`;
-      return;
-    }
-    box.innerHTML = data.map((it, i) => `
-      <a class="ledger-row" href="marketplace.html#${it.id}">
-        <span class="idx">${String(i + 1).padStart(3, "0")}</span>
-        <span>${esc(it.title)}</span>
-        <span class="hide-m" style="color:var(--muted);font-size:13px">${esc(it.seller_name)} · ${esc(it.category)}</span>
-        <span class="price">$${Number(it.price).toFixed(2)}</span>
-        <span class="arrow">↗</span>
-      </a>`).join("");
-  }
-
-  paintStats();
-  paintLedger();
 })();
