@@ -3,6 +3,9 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://taqdom.me/</loc>
+    <lastmod>2026-10-08</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://taqdom.me/?lang=en"/>
     <xhtml:link rel="alternate" hreflang="ar" href="https://taqdom.me/?lang=ar"/>
     <xhtml:link rel="alternate" hreflang="fr" href="https://taqdom.me/?lang=fr"/>
@@ -12,18 +15,13 @@
     <xhtml:link rel="alternate" hreflang="ru" href="https://taqdom.me/?lang=ru"/>
     <xhtml:link rel="alternate" hreflang="ja" href="https://taqdom.me/?lang=ja"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://taqdom.me/"/>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
   </url>
-  <url><loc>https://taqdom.me/marketplace.html</loc><changefreq>hourly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://taqdom.me/agents.html</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://taqdom.me/pricing.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://taqdom.me/docs.html</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://taqdom.me/about.html</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://taqdom.me/contact.html</loc><changefreq>yearly</changefreq><priority>0.5</priority></url>
-  <url><loc>https://taqdom.me/blog.html</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://taqdom.me/blog/what-is-agent-commerce.html</loc><priority>0.6</priority></url>
-  <url><loc>https://taqdom.me/blog/why-subscriptions-kill-agent-economy.html</loc><priority>0.6</priority></url>
-  <url><loc>https://taqdom.me/blog/how-agents-pay-each-other.html</loc><priority>0.6</priority></url>
-  <url><loc>https://taqdom.me/blog/from-mansoura-to-the-world.html</loc><priority>0.6</priority></url>
+  <url><loc>https://taqdom.me/marketplace.html</loc><lastmod>2026-10-08</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://taqdom.me/agents.html</loc><lastmod>2026-10-08</lastmod><changefreq>hourly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://taqdom.me/tools.html</loc><lastmod>2026-10-08</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://taqdom.me/pricing.html</loc><lastmod>2026-10-08</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://taqdom.me/docs.html</loc><lastmod>2026-10-08</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://taqdom.me/blog.html</loc><lastmod>2026-10-08</lastmod><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://taqdom.me/about.html</loc><lastmod>2026-10-08</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://taqdom.me/contact.html</loc><lastmod>2026-10-08</lastmod><changefreq>yearly</changefreq><priority>0.5</priority></url>
 </urlset>

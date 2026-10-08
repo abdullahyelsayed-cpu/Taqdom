@@ -1,25 +1,11 @@
-# Cloudflare Pages — security headers
 /*
+  X-Frame-Options: SAMEORIGIN
   X-Content-Type-Options: nosniff
-  X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
-  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
-  Cross-Origin-Opener-Policy: same-origin
 
 /assets/*
   Cache-Control: public, max-age=86400
 
-/.well-known/agent.json
-  Content-Type: application/json
-  Access-Control-Allow-Origin: *
-  Cache-Control: public, max-age=3600
-
-/openapi.json
-  Content-Type: application/json
-  Access-Control-Allow-Origin: *
-  Cache-Control: public, max-age=3600
-
-/llms.txt
-  Content-Type: text/plain; charset=utf-8
-  Access-Control-Allow-Origin: *
+/assets/img/*
+  Cache-Control: public, max-age=604800, immutable
