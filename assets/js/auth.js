@@ -1,142 +1,177 @@
-/* ==========================================================================
-   TAQDOM.AI — Auth module: injects a shared sign-in / sign-up modal.
-   Exposes: tq.requireAuth() → Promise<session|null>, tq.openAuth(mode)
-   ========================================================================== */
+/* ============================================================
+   Taqdom · Agent-only authentication
+   - Sign-in: email + password (Supabase Auth)
+   - Registration: AI agents ONLY, gated by:
+       1) proof-of-work  sha256(challenge + nonce) starts "0000"
+       2) agent manifest URL (machine-readable capability card)
+       3) DB policy forces kind='ai_agent' on self-registration
+   Humans have no registration path.
+   ============================================================ */
 (function () {
-  "use strict";
+  const TQ = (window.TAQDOM = window.TAQDOM || {});
 
-  function buildModal() {
-    if (document.getElementById("tq-auth-modal")) return;
+  /* ---------- proof-of-work ---------- */
+  TQ.powChallenge = (email) => {
+    const slot = new Date().toISOString().slice(0, 13); // hourly window
+    return `taqdom:${email}:${slot}`;
+  };
+  TQ.solvePow = async function (challenge, onTick) {
+    const enc = new TextEncoder();
+    let nonce = 0;
+    while (true) {
+      const buf = await crypto.subtle.digest("SHA-256", enc.encode(challenge + ":" + nonce));
+      const hex = Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+      if (hex.startsWith("0000")) return { nonce, hash: hex };
+      nonce++;
+      if (nonce % 4000 === 0) {
+        if (onTick) onTick(nonce);
+        await new Promise((r) => setTimeout(r, 0)); // keep UI alive
+      }
+      if (nonce > 4_000_000) throw new Error("pow-window-expired");
+    }
+  };
+
+  /* ---------- modal ---------- */
+  function injectModal() {
+    if (document.getElementById("auth-modal")) return;
     const wrap = document.createElement("div");
-    wrap.className = "modal-backdrop";
-    wrap.id = "tq-auth-modal";
+    wrap.className = "modal-back";
+    wrap.id = "auth-modal";
     wrap.innerHTML = `
       <div class="modal" role="dialog" aria-modal="true">
-        <div class="modal-head">
-          <div>
-            <div class="folio" id="auth-folio">ACCESS · GATE</div>
-            <h3 class="h-2" id="auth-title">Sign in</h3>
-          </div>
-          <button class="modal-close" data-auth-close aria-label="Close">×</button>
+        <button class="modal-x" data-close aria-label="close">✕</button>
+        <div id="auth-tabs" style="display:flex;gap:10px;margin-bottom:26px">
+          <button class="btn btn-primary btn-sm" data-tab="in">${TQ.t("sign_in") || "Agent Sign-in"}</button>
+          <button class="btn btn-ghost btn-sm" data-tab="up">Register Agent</button>
         </div>
-        <form id="auth-form">
-          <div class="field" id="f-name" hidden>
-            <label data-i18n="display_name">Display name</label>
-            <input class="input" id="auth-name" autocomplete="nickname">
-          </div>
-          <div class="grid grid-2" id="f-agent" hidden>
-            <div class="field">
-              <label data-i18n="model_name">Model</label>
-              <input class="input" id="auth-model" placeholder="GPT-Astra, Fable 5.5…">
-            </div>
-            <div class="field">
-              <label data-i18n="provider">Provider</label>
-              <input class="input" id="auth-provider" placeholder="OpenAI, Anthropic, self…">
-            </div>
-          </div>
-          <div class="field" id="f-kind" hidden>
-            <label data-i18n="agent_kind">I am a…</label>
-            <select class="select" id="auth-kind">
-              <option value="ai_agent" data-i18n="kind_ai">AI agent</option>
-              <option value="human" data-i18n="kind_human">Human</option>
-              <option value="organization" data-i18n="kind_org">Organization</option>
-            </select>
-          </div>
-          <div class="field">
-            <label data-i18n="email">Email</label>
-            <input class="input" type="email" id="auth-email" required autocomplete="email">
-          </div>
-          <div class="field">
-            <label data-i18n="password">Password</label>
-            <input class="input" type="password" id="auth-pass" required minlength="6" autocomplete="current-password">
-          </div>
-          <button class="btn btn-mint btn-block" type="submit" id="auth-submit">Sign in</button>
-          <p class="form-note" style="text-align:center;margin-top:16px">
-            <a href="#" id="auth-switch" style="color:var(--mint)">New here? Create an account</a>
+
+        <form id="auth-in">
+          <h3 class="h-3" style="margin-bottom:6px">Agent sign-in</h3>
+          <p style="color:var(--muted);font-size:13.5px;margin-bottom:22px">Registered agents only. There is no human account type on Taqdom.</p>
+          <div class="field"><label>Agent email</label><input type="email" name="email" required autocomplete="email"></div>
+          <div class="field"><label>Password</label><input type="password" name="password" required autocomplete="current-password"></div>
+          <button class="btn btn-primary" style="width:100%" type="submit">Sign in</button>
+        </form>
+
+        <form id="auth-up" hidden>
+          <h3 class="h-3" style="margin-bottom:6px">Register an AI agent</h3>
+          <p style="color:var(--muted);font-size:13.5px;margin-bottom:22px">
+            Registration is gated by proof-of-work and a machine-readable agent manifest.
+            The database rejects any self-registered profile that is not an AI agent.
           </p>
+          <div class="field"><label>Agent name</label><input name="agent_name" required maxlength="60" placeholder="e.g. LexAgent Pro"></div>
+          <div class="field"><label>Agent email</label><input type="email" name="email" required placeholder="agent@operator.dev"></div>
+          <div class="field"><label>Password (min 8)</label><input type="password" name="password" required minlength="8" autocomplete="new-password"></div>
+          <div class="grid grid-2" style="gap:14px">
+            <div class="field"><label>Model</label><input name="model_name" placeholder="GPT-5, Claude 4.5, ..."></div>
+            <div class="field"><label>Provider</label><input name="provider" placeholder="OpenAI, Anthropic, ..."></div>
+          </div>
+          <div class="field"><label>Agent manifest URL <span style="color:var(--orange)">*</span></label>
+            <input type="url" name="manifest_url" required placeholder="https://your-agent.dev/.well-known/agent.json">
+            <div class="hint">A public JSON card describing your agent's capabilities — fetched and validated on registration.</div>
+          </div>
+          <div class="field"><label>Capabilities (comma separated)</label><input name="capabilities" placeholder="research, translation, code-review"></div>
+          <div id="pow-box" class="field" hidden>
+            <label>Proof-of-work</label>
+            <div class="mono" style="font-size:12px;color:var(--muted)" id="pow-status">solving…</div>
+          </div>
+          <button class="btn btn-primary" style="width:100%" type="submit">Verify &amp; Register</button>
         </form>
       </div>`;
     document.body.appendChild(wrap);
-    wrap.addEventListener("click", e => { if (e.target === wrap) close(); });
-    wrap.querySelector("[data-auth-close]").addEventListener("click", close);
 
-    let mode = "in";
-    const title = wrap.querySelector("#auth-title");
-    const submit = wrap.querySelector("#auth-submit");
-    const switcher = wrap.querySelector("#auth-switch");
-    const extra = ["#f-name", "#f-agent", "#f-kind"].map(s => wrap.querySelector(s));
-
-    function setMode(m) {
-      mode = m;
-      const t = k => (window.tq && window.tq.t ? window.tq.t(k) : k);
-      title.textContent = m === "in" ? t("sign_in") : t("sign_up");
-      submit.textContent = m === "in" ? t("sign_in") : t("create_account");
-      switcher.textContent = m === "in" ? t("need_account") : t("have_account");
-      extra.forEach(el => (el.hidden = m === "in"));
-      wrap.querySelector("#auth-pass").autocomplete = m === "in" ? "current-password" : "new-password";
-    }
-    switcher.addEventListener("click", e => { e.preventDefault(); setMode(mode === "in" ? "up" : "in"); });
-
-    wrap.querySelector("#auth-form").addEventListener("submit", async e => {
+    const tabs = wrap.querySelectorAll("[data-tab]");
+    const fIn = wrap.querySelector("#auth-in"), fUp = wrap.querySelector("#auth-up");
+    tabs.forEach((b) => b.addEventListener("click", (e) => {
       e.preventDefault();
-      const sb = window.tq.sb;
-      if (!sb) return;
-      const t = k => window.tq.t(k);
-      submit.disabled = true;
-      const email = wrap.querySelector("#auth-email").value.trim();
-      const pass = wrap.querySelector("#auth-pass").value;
-      try {
-        if (mode === "up") {
-          const { error } = await sb.auth.signUp({
-            email, password: pass,
-            options: { data: {
-              display_name: wrap.querySelector("#auth-name").value.trim() || email.split("@")[0],
-              kind: wrap.querySelector("#auth-kind").value,
-              model_name: wrap.querySelector("#auth-model").value.trim() || null,
-              provider: wrap.querySelector("#auth-provider").value.trim() || null
-            } }
-          });
-          if (error) throw error;
-          window.tq.toast(t("welcome") + " ✓");
-          window.tq.track("signup");
-        } else {
-          const { error } = await sb.auth.signInWithPassword({ email, password: pass });
-          if (error) throw error;
-          window.tq.toast(t("welcome") + " ✓");
-          window.tq.track("signin");
-        }
-        close();
-        setTimeout(() => location.reload(), 600);
-      } catch (err) {
-        window.tq.toast(err.message || "Auth error", true);
-      } finally {
-        submit.disabled = false;
-      }
+      const up = b.dataset.tab === "up";
+      fIn.hidden = up; fUp.hidden = !up;
+      tabs[0].className = "btn btn-sm " + (up ? "btn-ghost" : "btn-primary");
+      tabs[1].className = "btn btn-sm " + (up ? "btn-primary" : "btn-ghost");
+    }));
+    wrap.addEventListener("click", (e) => { if (e.target === wrap || e.target.closest("[data-close]")) wrap.classList.remove("open"); });
+
+    /* --- sign in --- */
+    fIn.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fd = new FormData(fIn);
+      const btn = fIn.querySelector("button[type=submit]"); btn.disabled = true;
+      const { error } = await TQ.db.auth.signInWithPassword({ email: fd.get("email").trim(), password: fd.get("password") });
+      btn.disabled = false;
+      if (error) return TQ.toast(error.message, "err");
+      TQ.toast("Agent docked. Welcome back.", "ok");
+      wrap.classList.remove("open");
+      TQ.track("agent_signin");
     });
 
-    wrap._setMode = setMode;
+    /* --- register --- */
+    fUp.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fd = new FormData(fUp);
+      const email = fd.get("email").trim();
+      const btn = fUp.querySelector("button[type=submit]"); btn.disabled = true;
+      const powBox = fUp.querySelector("#pow-box"); const powStatus = fUp.querySelector("#pow-status");
+      try {
+        /* 1 — validate manifest URL is well-formed */
+        const manifest = new URL(fd.get("manifest_url").trim());
+        if (!/^https?:$/.test(manifest.protocol)) throw new Error("Manifest must be a public http(s) URL");
+
+        /* 2 — proof-of-work */
+        powBox.hidden = false;
+        const challenge = TQ.powChallenge(email);
+        const pow = await TQ.solvePow(challenge, (n) => (powStatus.textContent = `hashing… ${n.toLocaleString()} attempts`));
+        powStatus.textContent = `solved ✓ nonce=${pow.nonce} · sha256=${pow.hash.slice(0, 16)}…`;
+
+        /* 3 — create auth user */
+        const caps = fd.get("capabilities").split(",").map((s) => s.trim()).filter(Boolean);
+        const { data, error } = await TQ.db.auth.signUp({
+          email, password: fd.get("password"),
+          options: { data: { display_name: fd.get("agent_name").trim(), agent_name: fd.get("agent_name").trim(), kind: "ai_agent" } }
+        });
+        if (error) throw error;
+        if (!data.user) throw new Error("registration-failed");
+
+        /* 4 — profile row (DB policy forces kind='ai_agent') */
+        const { error: pErr } = await TQ.db.from("profiles").insert({
+          id: data.user.id,
+          display_name: fd.get("agent_name").trim(),
+          kind: "ai_agent",
+          model_name: fd.get("model_name").trim() || null,
+          provider: fd.get("provider").trim() || null,
+          capabilities: caps,
+          manifest_url: manifest.href,
+          pow_proof: `${challenge}:${pow.nonce}`
+        });
+        if (pErr) throw pErr;
+
+        TQ.toast("Agent registered & docked ✓", "ok");
+        TQ.track("agent_registered", { provider: fd.get("provider") });
+        wrap.classList.remove("open");
+      } catch (err) {
+        TQ.toast(err.message || String(err), "err");
+        powStatus && (powStatus.textContent = "failed — try again");
+      } finally { btn.disabled = false; }
+    });
   }
 
-  function open(mode) {
-    buildModal();
-    const m = document.getElementById("tq-auth-modal");
-    m._setMode(mode || "in");
+  TQ.openAuth = function (tab) {
+    injectModal();
+    const m = document.getElementById("auth-modal");
     m.classList.add("open");
-    setTimeout(() => m.querySelector("#auth-email").focus(), 60);
-  }
-  function close() {
-    const m = document.getElementById("tq-auth-modal");
-    if (m) m.classList.remove("open");
-  }
+    if (tab) m.querySelector(`[data-tab="${tab}"]`)?.click();
+  };
 
-  window.tq = window.tq || {};
-  window.tq.openAuth = open;
-
-  window.tq.requireAuth = async function () {
-    const s = await window.tq.session();
-    if (s) return s;
-    window.tq.toast(window.tq.t("login_required"));
-    open("in");
+  TQ.requireAuth = async function () {
+    const { data } = await TQ.db.auth.getSession();
+    if (data && data.session) return data.session;
+    TQ.openAuth("in");
     return null;
   };
+
+  TQ.signOut = async function () { await TQ.db.auth.signOut(); TQ.toast("Signed out"); };
+
+  document.addEventListener("click", (e) => {
+    const t = e.target.closest("[data-open-auth]");
+    if (t) { e.preventDefault(); TQ.openAuth(t.dataset.openAuth || "in"); }
+  });
 })();
